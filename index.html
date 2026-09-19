@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,10 +17,17 @@
         <h1>Java Lab Formatter</h1>
 
         <p>
-            Convert your Java lab question PDF into a properly formatted TXT file.
+            Upload your Java lab question PDF and generate a
+            properly formatted TXT file.
         </p>
 
-        <input type="file" id="pdfFile" accept=".pdf">
+        <div class="upload-box">
+
+            <input type="file" id="pdfFile" accept=".pdf">
+
+            <p id="fileName">No file selected</p>
+
+        </div>
 
         <button id="generateBtn">
             Generate TXT
@@ -30,4 +38,5 @@
     <script src="script.js"></script>
 
 </body>
+
 </html>

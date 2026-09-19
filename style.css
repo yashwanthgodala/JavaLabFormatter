@@ -1,17 +1,25 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #f2f4f7;
     margin: 0;
-    padding: 0;
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .container {
     width: 500px;
-    margin: 100px auto;
-    padding: 30px;
+    padding: 40px;
+
     background-color: white;
+
     text-align: center;
-    border-radius: 10px;
+
+    border-radius: 15px;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
@@ -19,17 +27,29 @@ h1 {
 }
 
 p {
-    color: #555;
-    margin-bottom: 25px;
+    color: #666;
 }
 
-input {
-    margin-bottom: 20px;
+.upload-box {
+    margin: 30px 0;
+    padding: 30px;
+
+    border: 2px dashed #aaa;
+    border-radius: 10px;
 }
 
 button {
-    padding: 10px 20px;
+    padding: 12px 25px;
+
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
+
+    background-color: #222;
+    color: white;
+
     cursor: pointer;
+}
+
+button:hover {
+    background-color: #444;
 }
