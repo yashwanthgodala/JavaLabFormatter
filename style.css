@@ -1447,3 +1447,19 @@ footer {
     transform: rotate(360deg);
   }
 }
+.upload-note {
+  width: fit-content;
+  max-width: 90%;
+  margin: 12px auto 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(234, 215, 189, 0.7);
+  color: #735d48;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.upload-note strong {
+  color: #5f432b;
+}
