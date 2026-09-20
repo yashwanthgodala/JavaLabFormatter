@@ -1,8 +1,9 @@
 # ☕ Java Lab Formatter
 
-A web-based tool that converts Java Programming Lab question PDFs into a clean, structured TXT format.
+A web-based tool that automatically extracts and formats Java Programming Lab content from PDF files into a clean and structured `.txt` format.
 
-Instead of manually copying and formatting questions from a PDF, simply upload the PDF and let the formatter extract and organize the questions automatically.
+The project is designed to simplify the process of converting unstructured lab PDFs into an organized format that is easier to read, use, and maintain.
+
 
 ## 🌐 Live Website
 
@@ -12,42 +13,71 @@ Instead of manually copying and formatting questions from a PDF, simply upload t
 
 ---
 
-## ✨ Features
+## 🚀 Features
 
-- 📄 Upload Java Lab question PDFs
-- 🤖 AI-powered question extraction using Gemini
-- 📝 Automatically formats questions into a structured TXT file
-- 📌 Preserves question details and subsections
-- 📂 Detects program filenames from the source PDF
-- ⬇️ Download the formatted TXT file
-- 🎨 Interactive machine-style user interface
-- 🌐 Accessible directly from a web browser
-- 🔐 Gemini API key is stored securely as an environment variable
+- 📄 Upload PDF files
+- 🔍 Intelligent PDF content extraction
+- 🖼️ Support for text-based and image-based PDF content
+- 🤖 AI-powered content analysis using Google Gemini
+- ✨ Automatic formatting and structuring
+- 📁 Detects Java program/file names
+- 📚 Handles multiple programs within a document
+- ⬇️ Download formatted content as a `.txt` file
+- 🌐 Fully web-based
+- 💻 No installation required for end users
 
 ---
 
-## 📌 What PDF Should I Upload?
+## 🛠️ Tech Stack
 
-> **Note:** Upload a PDF containing questions.  
-> For best results, use **Java Programming Lab question PDFs**.
+### Frontend
+- HTML
+- CSS
+- JavaScript
 
-The formatter works best when the PDF contains clearly structured questions, filenames, subsections, and requirements.
+### Backend
+- Python
+- Flask
+- Flask-CORS
 
-### Recommended
+### PDF Processing
+- PyPDF
+
+### AI
+- Google Gemini API
+- Gemini Files API
+
+### Deployment
+- Render
+- Gunicorn
+
+### Version Control
+- Git
+- GitHub
+
+---
+
+## 📂 Project Structure
+
+```text
+JavaLabFormatter/
+│
+├── index.html
+├── style.css
+├── script.js
+├── requirements.txt
+├── .gitignore
+│
+└── Backend/
+    └── app.py
+
+## Recommended
 
 - Java Programming Lab question papers
 - Java lab assignment PDFs
 - Java practical/lab question sheets
 - PDFs containing programming questions
 
-### Avoid
-
-- Scanned PDFs with no selectable text
-- Image-only PDFs
-- PDFs containing only handwritten content
-- PDFs unrelated to programming/lab questions
-
----
 
 ## ⚙️ How It Works
 
