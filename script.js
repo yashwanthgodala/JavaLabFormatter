@@ -196,7 +196,7 @@ generateButton.addEventListener("click", async () => {
     await runStep(1, 1, 35, "ANALYZING CONTENT...");
     await runStep(2, 2, 65, "FORMATTING WITH AI...");
 
-    const response = await fetch("http://127.0.0.1:5000/upload", {
+    const response = await fetch("/upload", {
       method: "POST",
       body: formData
     });
