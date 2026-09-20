@@ -1,47 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Java Lab Formatter</title>
-
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Lab Formatter</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <div class="scene">
+    <header class="topbar">
+      <div class="brand"><span>☕</span> Java Lab Formatter</div>
+      <nav>
+        <a href="#about">About</a>
+        <a href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
 
-    <div class="container">
+    <main>
+      <div class="process-pill">PDF <b>→</b> AI <b>→</b> TXT</div>
+      <h1>Java Lab Formatter</h1>
+      <p class="subtitle">
+        Drop your lab PDF into the machine and get a clean, structured TXT file.
+      </p>
 
-        <h1>Java Lab Formatter</h1>
+      <section class="factory" aria-label="PDF to TXT formatter">
+        <!-- INPUT STATION -->
+        <div class="station input-station" id="inputStation">
+          <label class="tray input-tray" for="pdfFile" title="Choose or drop PDF">
+            <div class="tray-inner">
+              <div class="paper-stack input-papers" aria-hidden="true">
+                <div class="paper back">
+                  <span>PDF</span><i></i><i></i><i></i>
+                </div>
+                <div class="paper middle">
+                  <span>PDF</span><i></i><i></i><i></i>
+                </div>
+                <div class="paper front">
+                  <span>PDF</span><i></i><i></i><i></i>
+                </div>
+              </div>
+            </div>
+            <div class="tray-paper-cover"></div>
+            <div class="tray-front">
+              <span class="tray-action" aria-hidden="true">↥</span>
+              <strong>DROP YOUR PDF HERE</strong>
+              <small id="fileName">No file selected</small>
+            </div>
+          </label>
 
-        <p>
-            Upload your Java lab question PDF and generate a
-            properly formatted TXT file.
-        </p>
-
-        <div class="upload-box">
-
-            <input type="file" id="pdfFile" accept=".pdf">
-
-            <p id="fileName">No file selected</p>
-
+          <input id="pdfFile" type="file" accept="application/pdf,.pdf" hidden>
+          <div class="hover-tip input-tip">Choose / drop PDF</div>
         </div>
 
-        <button id="generateBtn">
-            Generate TXT
-        </button>
-        <!-- Area where extracted PDF text will be displayed -->
-        <pre id="output"></pre>
-        <button id="downloadBtn" style="display: none;">
-          Download TXT
-        </button>
+        <!-- INPUT CONNECTION -->
+        <div class="machine-link input-link" aria-hidden="true">
+          <div class="connector-belt"></div>
+          <div class="connector-cap connector-cap-start"></div>
+          <div class="connector-cap connector-cap-end"></div>
+        </div>
 
+        <!-- MACHINE -->
+        <section class="machine" id="machine">
+          <div class="machine-cap">Java Lab Formatter</div>
+          <div class="status-light" id="statusLight" aria-label="Machine idle"></div>
+
+          <div class="machine-body">
+            <div class="screen">
+              <div class="screen-title" id="statusTitle">READY</div>
+              <div class="progress"><span id="progressBar"></span></div>
+
+              <div class="steps">
+                <div id="step1">○ Reading PDF</div>
+                <div id="step2">○ Analyzing content</div>
+                <div id="step3">○ Formatting with AI</div>
+                <div id="step4">○ Generating TXT</div>
+              </div>
+
+              <div class="screen-gears" aria-hidden="true">
+                <span>⚙</span><span>⚙</span>
+              </div>
+            </div>
+
+            <div class="machine-label">PDF <b>→</b> AI <b>→</b> CLEAN TEXT</div>
+          </div>
+
+          <div class="machine-foot"><i></i><i></i></div>
+        </section>
+
+        <!-- OUTPUT CONNECTION -->
+        <div class="machine-link output-link" aria-hidden="true">
+          <div class="connector-belt"></div>
+          <div class="connector-cap connector-cap-start"></div>
+          <div class="connector-cap connector-cap-end"></div>
+        </div>
+
+        <!-- OUTPUT STATION -->
+        <div class="station output-station" id="outputStation">
+          <div class="tray output-tray">
+            <div class="tray-inner">
+              <div class="paper-stack output-papers">
+                <button
+                  class="txt-paper"
+                  id="outputFile"
+                  type="button"
+                  disabled
+                  title="Click to view TXT"
+                  aria-label="View generated TXT"
+                >
+                  <span>TXT</span>
+                  <i></i><i></i><i></i>
+                  <strong id="outputName">Java_Lab_Questions.txt</strong>
+                </button>
+              </div>
+            </div>
+            <div class="tray-paper-cover"></div>
+            <div class="tray-front">
+              <small id="outputCaption">Your finished file will appear here</small>
+            </div>
+          </div>
+
+          <button
+            class="download-btn"
+            id="downloadBtn"
+            type="button"
+            disabled
+            title="Download TXT"
+            aria-label="Download TXT"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 19h14" />
+            </svg>
+            <span class="download-label">Download TXT</span>
+          </button>
+
+          <div class="hover-tip output-tip">
+            Click TXT to view · Download button to save
+          </div>
+        </div>
+      </section>
+
+      <div class="controls">
+        <button class="start-btn" id="generateBtn" type="button">
+          ▶ <span>Start Processing</span>
+        </button>
+        <button class="reset-btn" id="resetBtn" type="button">
+          ↻ <span>Reset</span>
+        </button>
+      </div>
+
+      <p class="hint" id="hint">Select a PDF to activate the machine.</p>
+    </main>
+
+    <footer id="about">PDF → AI → TXT · Java lab question formatter</footer>
+  </div>
+
+  <!-- Full-screen document viewer -->
+  <section class="viewer" id="previewPanel" hidden>
+    <div class="viewer-backdrop" id="previewBackdrop"></div>
+
+    <div class="viewer-card" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
+      <div class="viewer-head">
+        <div>
+          <small>DOCUMENT PREVIEW</small>
+          <h2 id="previewTitle">Java_Lab_Questions.txt</h2>
+        </div>
+        <button id="closePreview" class="close-btn" type="button" aria-label="Close preview">×</button>
+      </div>
+
+      <div class="viewer-toolbar">
+        <span>Generated TXT file</span>
+        <button id="modalDownload" type="button">↓ Download TXT</button>
+      </div>
+
+      <pre id="output"></pre>
     </div>
+  </section>
 
-    <script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
-
 </html>
