@@ -8,7 +8,7 @@ const fileName = document.getElementById("fileName");
 
 // Get the Generate TXT button
 const generateButton = document.getElementById("generateBtn");
-
+const downloadButton = document.getElementById("downloadBtn");
 
 // This runs whenever the user selects a file
 pdfFile.addEventListener("change", function () {
@@ -60,8 +60,34 @@ generateButton.addEventListener("click", async function () {
         const data = await response.json();
 
 
-        // Display the extracted PDF text on the webpage
-        output.textContent = data.text;
+        // Display Gemini's analysis on the webpage
+        output.textContent = data.formatted_text;
+        // Show the download button after formatting is complete
+        downloadButton.style.display = "block";
+
+        // Store the formatted text for downloading
+        downloadButton.onclick = function () {
+
+            // Create a text file from the formatted output
+            const blob = new Blob(
+                [data.formatted_text],
+                { type: "text/plain" }
+            );
+
+            // Create a temporary download link
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+
+            link.href = url;
+            link.download = "Java_Lab_Questions.txt";
+
+            // Start the download
+            link.click();
+
+            // Clean up the temporary URL
+            URL.revokeObjectURL(url);
+        };
 
         alert("PDF processed successfully! Check the browser console.");
 
