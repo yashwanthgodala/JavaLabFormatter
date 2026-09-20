@@ -3,7 +3,7 @@ import json
 import os
 from flask_cors import CORS
 # Flask is used to create our web server/backend
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,send_from_directory
 
 # PdfReader is used to read text from PDF files
 from pypdf import PdfReader
@@ -24,6 +24,27 @@ client = genai.Client(api_key=api_key)
 # Create our Flask application
 app = Flask(__name__)
 CORS(app)  # This allows our frontend to communicate with our backend
+# Get the main project folder
+# app.py is inside Backend/, so we go one folder up
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+# Serve the main website
+@app.route("/")
+def home():
+    return send_from_directory(BASE_DIR, "index.html")
+
+
+# Serve CSS
+@app.route("/style.css")
+def style():
+    return send_from_directory(BASE_DIR, "style.css")
+
+
+# Serve JavaScript
+@app.route("/script.js")
+def script():
+    return send_from_directory(BASE_DIR, "script.js")
 # This function sends the extracted PDF text to Gemini
 # This function sends the PDF text to Gemini
 # and asks Gemini to identify the structure of the lab questions.
