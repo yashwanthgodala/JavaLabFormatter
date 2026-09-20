@@ -1,6 +1,7 @@
 # Used to convert JSON text into Python objects
 import json
 import os
+import tempfile
 from flask_cors import CORS
 # Flask is used to create our web server/backend
 from flask import Flask, request, jsonify,send_from_directory
@@ -48,71 +49,83 @@ def script():
 # This function sends the extracted PDF text to Gemini
 # This function sends the PDF text to Gemini
 # and asks Gemini to identify the structure of the lab questions.
-def analyze_with_gemini(text):
+def analyze_with_gemini(pdf_path, extracted_text=""):
+    """
+    Sends the actual PDF to Gemini so it can read both normal PDF text
+    and text that appears inside images/scanned pages.
+    """
 
     prompt = """
 You are a Java Programming Lab question extractor.
 
-Read the provided Java lab PDF text and extract the questions.
+Read the ENTIRE attached PDF visually and extract the Java lab questions.
+The PDF may contain a mixture of selectable text, scanned text, screenshots,
+and images containing questions or Java code. You MUST read text inside
+images as well as normal PDF text.
+
+IMPORTANT CUTOFF:
+- Extract questions only from Question 1 through Question 13.
+- STOP after Question 13.
+- Do NOT extract examples, reference material, explanations, code samples,
+  or other content that appears after Question 13.
+- If Question 13 continues across pages, include all content that belongs
+  to Question 13 before stopping.
 
 IMPORTANT RULES:
 
-1. Preserve the original wording of the questions exactly.
-   Do NOT rewrite, summarize, simplify, combine, or paraphrase
-   the main question.
+1. Preserve the original wording of the questions exactly as it appears.
+   Do NOT rewrite, summarize, simplify, combine, or paraphrase the main
+   question.
 
-2. Preserve the original wording of every bullet/detail exactly
-   as much as possible.
+2. Preserve the original wording of every bullet/detail as much as possible.
 
-3. Do NOT guess or invent filenames.
+3. Read text from images and screenshots. Do not ignore a question merely
+   because it is embedded as an image.
 
-4. Do NOT guess or invent subsection titles.
+4. Do NOT guess or invent filenames.
 
-5. Keep each bullet/detail associated with the correct question
-   and program.
-6. Detect FileName/File Name information from the PDF.
-   The filename must be copied exactly from the source text.
-7. If a question contains MULTIPLE different filenames, create a
-   separate program object for each filename.
-8. If a question contains ONLY ONE filename, still store it internally,
-   but the formatter will not display the filename separately.
-9. Do not create separate programs merely because a question has
-   a), b), c) subparts. Create separate programs when they represent
-   different filenames/programs.
-10. For questions involving errors, use section_type = "Errors".
-11. Otherwise use section_type = "Output".
-12. Do not invent filenames, programs, subparts, or information.
-13. If a filename belongs to a subsection such as
-    "Static Fields (Class Variables)", preserve that subsection title
+5. Do NOT guess or invent subsection titles.
+
+6. Keep each bullet/detail associated with the correct question and program.
+
+7. Detect FileName, File Name, Program Name, and filenames shown inside
+   images. Copy the filename exactly from the PDF.
+
+8. If a question contains MULTIPLE different filenames, create a separate
+   program object for each filename.
+
+9. If a question contains ONLY ONE filename, still store it inside the
+   programs array.
+
+10. Do not create separate programs merely because a question has a), b),
+    c) subparts. Create separate programs when they represent different
+    filenames/programs.
+
+11. For questions involving errors, use section_type = "Errors".
+
+12. Otherwise use section_type = "Output".
+
+13. Do not invent filenames, programs, subparts, or information.
+
+14. If a filename belongs to a subsection, preserve that subsection title
     in section_title.
 
-14. Preserve the original subsection title exactly.
+15. Preserve the original subsection title exactly.
     Do not replace it with the program name.
 
-15. The section_title and filename must remain separate pieces of information.
-16. Preserve subsection headings exactly as they appear in the PDF.
+16. Keep section_title and filename as separate pieces of information.
 
-17. A subsection heading is text such as:
-    "Static Fields (Class Variables)"
-    "Static Methods"
-    "Static Initialization Block"
-    "Single / Simple Inheritance"
-    "Hierarchical Inheritance"
-    "Multi-level Inheritance"
+17. Do NOT duplicate the same detail in both the question-level details
+    array and a program's details array.
 
-18. If a subsection heading appears before a FileName/File Name,
-    store that heading in section_title.
+18. If a requirement is specifically associated with a filename, put it
+    only inside that program's details array.
 
-19. Do NOT use the program name as section_title.
+19. The attached PDF is the primary source of truth. The extracted text
+    supplied below is only supplemental because image-only content may be
+    missing from it.
 
-20. Do NOT duplicate the same detail in both the question-level
-    details array and a program's details array.
-
-21. If a requirement is specifically associated with a filename,
-    put it only inside that program's details array.
-
-22. Preserve FileName/File Name information exactly as it appears
-    in the source.
+20. Ignore code/example material that is not part of Questions 1-13.
 
 Return ONLY valid JSON.
 Do NOT use markdown code fences such as ```json.
@@ -142,20 +155,21 @@ Use exactly this structure:
     ]
 }
 
-If there is only one filename for a question, still put it inside
-the programs array.
+SUPPLEMENTAL TEXT EXTRACTED BY PYPDF:
+"""
 
-PDF TEXT:
-""" + text
+    prompt += extracted_text
 
-    # Send the PDF text and instructions to Gemini
+    # Upload the actual PDF so Gemini can inspect visual/image content.
+    uploaded_pdf = client.files.upload(file=pdf_path)
+
     response = client.models.generate_content(
         model="gemini-3.5-flash-lite",
-        contents=prompt
+        contents=[prompt, uploaded_pdf]
     )
 
-    # Return Gemini's response
     return response.text
+
 
 # This function cleans Gemini's response
 # and converts it into a Python dictionary.
@@ -563,40 +577,71 @@ def format_questions(data):
 @app.route("/upload", methods=["POST"])
 def upload():
 
-    # Get the uploaded PDF
-    file = request.files["pdf"]
+    # Get the uploaded PDF from the browser.
+    file = request.files.get("pdf")
 
-    # Read the PDF
-    reader = PdfReader(file)
+    if not file:
+        return jsonify({"error": "No PDF file was uploaded."}), 400
 
-    text = ""
+    # Save the uploaded PDF temporarily because the Gemini Files API
+    # accepts a local file path.
+    temp_path = None
 
-    # Extract text from every page
-    for page in reader.pages:
-        page_text = page.extract_text()
+    try:
+        with tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix=".pdf"
+        ) as temp_file:
+            file.save(temp_file)
+            temp_path = temp_file.name
 
-        if page_text:
-            text += page_text + "\n"
+        # Extract normal/selectable PDF text as supplemental information.
+        # Gemini will also inspect the actual PDF for image-based content.
+        reader = PdfReader(temp_path)
+        text = ""
 
-    # Send PDF text to Gemini
-    ai_result = analyze_with_gemini(text)
+        for page in reader.pages:
+            page_text = page.extract_text()
 
-    questions = clean_json_response(ai_result)
+            if page_text:
+                text += page_text + "\n"
 
-    # Correct filenames and subsection titles using
-    # the original PDF text.
-    questions = apply_source_metadata(
-        questions,
-        text
-    )
+        # Send both the actual PDF and its extracted text to Gemini.
+        ai_result = analyze_with_gemini(
+            temp_path,
+            text
+        )
 
-    formatted_text = format_questions(questions)
+        questions = clean_json_response(ai_result)
 
-    # Send the formatted result to frontend
-    return jsonify({
-        "questions": questions,
-        "formatted_text": formatted_text
-    })
+        # Safety cutoff: this formatter currently stops at Question 13.
+        questions["questions"] = [
+            question
+            for question in questions.get("questions", [])
+            if isinstance(question.get("number"), int)
+            and question["number"] <= 13
+        ]
+
+        formatted_text = format_questions(questions)
+
+        return jsonify({
+            "questions": questions,
+            "formatted_text": formatted_text
+        })
+
+    except Exception as error:
+        print("UPLOAD ERROR:", error)
+        return jsonify({
+            "error": "Failed to process the PDF.",
+            "details": str(error)
+        }), 500
+
+    finally:
+        # Remove the temporary local copy after processing.
+        if temp_path and os.path.exists(temp_path):
+            os.remove(temp_path)
+
+
 # Start the Flask development server
 if __name__ == "__main__":
     app.run(debug=True)
